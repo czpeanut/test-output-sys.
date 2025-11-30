@@ -1,7 +1,9 @@
-// 知識點統計容器 (需在全局範圍內定義，供不同函數使用)
+// 知識點統計容器
 let knowledgePointsStats = {};
+// 【新增】全局變數儲存圖表實例，用於銷毀舊圖表
+let radarChartInstance = null;
 
-// A. 初始化：根據 QUIZ_DATA 生成答案輸入框
+// A. 初始化：根據 QUIZ_DATA 生成答案輸入框 (保持不變)
 document.addEventListener('DOMContentLoaded', () => {
     const answersForm = document.getElementById('answers-form');
     QUIZ_DATA.forEach(item => {
@@ -17,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // B. 核心分析函數
 function analyzeAndGenerateReport() {
-    // 1. 獲取學生輸入
+    // 1. 獲取學生輸入 (保持不變)
     const studentName = document.getElementById('student-name').value;
     const studentSchool = document.getElementById('student-school').value;
     const studentGrade = document.getElementById('student-grade').value;
@@ -35,19 +37,15 @@ function analyzeAndGenerateReport() {
         return;
     }
 
-    // 2. 進行評分與知識點分析
+    // 2. 進行評分與知識點分析 (保持不變)
     let totalScore = 0;
-    
-    // 重置知識點統計
     knowledgePointsStats = {}; 
     const totalMaxScore = QUIZ_DATA.reduce((sum, item) => sum + item.points, 0);
 
-    // 初始化知識點統計
     ALL_KNOWLEDGE_POINTS.forEach(kp => {
         knowledgePointsStats[kp] = { attempted: 0, correct: 0, score: 0, maxScore: 0 };
     });
 
-    // 計算分數和統計
     QUIZ_DATA.forEach(item => {
         const studentAns = studentAnswers[item.id.toString()];
         const isCorrect = (studentAns === item.correctAnswer);
@@ -68,16 +66,28 @@ function analyzeAndGenerateReport() {
         });
     });
 
-    // 3. 判斷熟練度等級和生成綜合評語
+    // 3. 判斷熟練度等級和生成綜合評語 (保持不變)
     const knowledgeAnalysisHTML = generateKnowledgeAnalysisHTML(knowledgePointsStats);
     const assessmentMessage = generateAssessmentMessage(totalScore, totalMaxScore);
 
-    // 4. 渲染成績單
+    // 4. 渲染成績單基礎內容
     renderReport(studentName, studentSchool, studentGrade, totalScore, totalMaxScore, knowledgeAnalysisHTML, assessmentMessage);
+
+    // 【新增】 5. 準備數據並渲染雷達圖
+    const chartLabels = [];
+    const chartData = [];
+    ALL_KNOWLEDGE_POINTS.forEach(kp => {
+        chartLabels.push(kp);
+        // 計算百分比 (0-100)
+        const stat = knowledgePointsStats[kp];
+        const percentage = stat.maxScore > 0 ? (stat.score / stat.maxScore) * 100 : 0;
+        chartData.push(percentage.toFixed(1));
+    });
+    renderRadarChart(chartLabels, chartData);
 }
 
 
-// C. 渲染成績單 HTML
+// C. 渲染成績單 HTML (保持不變)
 function renderReport(name, school, grade, score, maxScore, analysisHTML, assessmentMsg) {
     document.getElementById('student-info-display').innerHTML = `
         <div><strong>姓名:</strong> ${name}</div>
@@ -94,13 +104,74 @@ function renderReport(name, school, grade, score, maxScore, analysisHTML, assess
     document.getElementById('skill-chart').innerHTML = analysisHTML;
     document.getElementById('assessment-message').innerHTML = assessmentMsg;
 
-    // 切換介面：隱藏輸入區，顯示報告區
     document.getElementById('input-container').classList.add('hidden');
     document.getElementById('report-container').classList.remove('hidden');
 }
 
+// 【新增】 F. 渲染雷達圖函數
+function renderRadarChart(labels, data) {
+    const ctx = document.getElementById('skillRadarChart').getContext('2d');
 
-// D. 知識點分析 HTML 生成
+    // 如果已經存在圖表實例，先銷毀它，防止重疊
+    if (radarChartInstance) {
+        radarChartInstance.destroy();
+    }
+
+    // Chart.js 配置
+    radarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '知識點熟練度 (%)',
+                data: data,
+                // 螢幕顯示：科技感螢光藍填充和邊框
+                backgroundColor: 'rgba(0, 240, 255, 0.3)', 
+                borderColor: '#00f0ff',
+                pointBackgroundColor: '#00f0ff',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#00f0ff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // 允許我們透過 CSS 控制高度
+            scales: {
+                r: {
+                    angleLines: {
+                        color: 'rgba(201, 209, 217, 0.3)' // 網格線顏色 (適應深色和淺色背景)
+                    },
+                    grid: {
+                        color: 'rgba(201, 209, 217, 0.3)' // 環形網格顏色
+                    },
+                    pointLabels: {
+                        color: '#8b949e', // 標籤文字顏色 (適應深色和淺色背景)
+                        font: {
+                            size: 12
+                        }
+                    },
+                    ticks: {
+                        beginAtZero: true,
+                        max: 100, // 最大值固定為 100%
+                        stepSize: 20, // 刻度間隔
+                        color: '#8b949e', // 刻度數字顏色
+                        backdropColor: 'transparent' // 刻度背景透明
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false // 隱藏圖例，讓畫面更簡潔
+                }
+            }
+        }
+    });
+}
+
+
+// D. 知識點分析 HTML 生成 (保持不變)
 function generateKnowledgeAnalysisHTML(stats) {
     let html = `
         <table class="skill-table">
@@ -118,7 +189,6 @@ function generateKnowledgeAnalysisHTML(stats) {
 
     for (const kp in stats) {
         const stat = stats[kp];
-        // 避免除以零
         const proficiency = stat.maxScore > 0 ? (stat.score / stat.maxScore) : 0;
         const proficiencyPercent = (proficiency * 100).toFixed(0);
         const level = getProficiencyLevel(proficiency);
@@ -141,7 +211,7 @@ function generateKnowledgeAnalysisHTML(stats) {
     return html;
 }
 
-// 根據百分比返回熟練度等級
+// 根據百分比返回熟練度等級 (保持不變)
 function getProficiencyLevel(ratio) {
     if (ratio >= 0.85) {
         return { text: "精通 (Master)", class: "high" };
@@ -153,7 +223,7 @@ function getProficiencyLevel(ratio) {
 }
 
 
-// E. 綜合能力評語生成
+// E. 綜合能力評語生成 (保持不變)
 function generateAssessmentMessage(score, maxScore) {
     const ratio = score / maxScore;
     let message = "";
@@ -168,7 +238,6 @@ function generateAssessmentMessage(score, maxScore) {
         message = "評語: **學科能力待加強**，部分核心知識點掌握不牢固，建議從基礎概念開始，全面梳理知識體系。";
     }
 
-    // 根據知識點細節添加提示
     const lowestSkill = ALL_KNOWLEDGE_POINTS.reduce((min, kp) => {
         const stat = knowledgePointsStats[kp];
         const ratio = stat.maxScore > 0 ? (stat.score / stat.maxScore) : 1;
@@ -182,5 +251,5 @@ function generateAssessmentMessage(score, maxScore) {
         message += `<br><br>特別提醒：您在「**${lowestSkill.name}**」知識點的得分率最低 (${(lowestSkill.ratio * 100).toFixed(0)}%)，這是您目前最需要優先加強的部分。`;
     }
 
-    return message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // 將 **加粗** 轉換為 HTML
+    return message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 }

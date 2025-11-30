@@ -1,70 +1,38 @@
-/* 隱藏列印按鈕在列印模式下 */
-@media print {
-    .print-button {
-        display: none !important;
-    }
-    .form-container {
-        display: none !important;
-    }
-    .report-container {
-        /* 列印時移除邊距，讓內容填滿紙張 */
-        margin: 0;
-        box-shadow: none;
-        color: #000; /* 列印時文字改為黑色，以節省墨水並保證清晰度 */
-        background: #fff; /* 列印時背景改為白色 */
-    }
-    /* 列印時移除螢光色和深色背景 */
-    .report-title, h3, .score {
-        color: #111 !important; 
-        text-shadow: none !important;
-    }
-    .info-section div {
-        border: 1px solid #ccc;
-    }
-}
+/* ========================================================= */
+/* 螢幕顯示樣式 (SCREEN Styles) - 科技感深色風格 (保持不變) */
+/* ========================================================= */
 
-/* 基礎設定 */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #0d1117; /* 深色背景 */
-    color: #c9d1d9; /* 淺灰色字體 */
+    background-color: #0d1117;
+    color: #c9d1d9;
     padding: 20px;
+    font-size: 16px;
 }
 
-/* 容器樣式 */
 .form-container, .report-container {
     max-width: 800px;
     margin: 40px auto;
     padding: 30px;
-    background: #161b22; /* 比背景稍淺的容器色 */
+    background: #161b22;
     border: 2px solid #2d3640;
     border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2); /* 科技感光暈 */
-    transition: all 0.5s ease;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
 }
 
-.hidden {
-    display: none;
-}
+.hidden { display: none; }
 
-/* 輸入框和按鈕樣式 */
+/* 輸入框和按鈕 (保持不變) */
 input[type="text"], select {
     width: calc(100% - 22px);
     padding: 10px;
     margin-bottom: 15px;
-    border: 1px solid #00f0ff; /* 螢光藍邊框 */
+    border: 1px solid #00f0ff;
     background: #0d1117;
     color: #00f0ff;
     border-radius: 4px;
-    outline: none;
-    transition: border-color 0.3s;
+    font-size: 1em; 
 }
-
-input[type="text"]:focus, select:focus {
-    border-color: #ff00aa;
-    box-shadow: 0 0 5px rgba(255, 0, 170, 0.5);
-}
-
 button {
     background-color: #00f0ff;
     color: #161b22;
@@ -73,16 +41,10 @@ button {
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
-    transition: background-color 0.3s;
     margin-top: 20px;
 }
-
-button:hover {
-    background-color: #00cccc;
-}
-
 .print-button {
-    background-color: #ff00aa; /* 列印按鈕使用粉色 */
+    background-color: #ff00aa;
     color: #fff;
     display: block;
     width: 100%;
@@ -90,113 +52,202 @@ button:hover {
     margin: 30px auto 10px auto;
 }
 
-.print-button:hover {
-    background-color: #cc0088;
-}
+/* 成績單螢幕樣式 */
+header { border-bottom: 3px solid #00f0ff; padding-bottom: 10px; margin-bottom: 20px; }
+.report-title { font-size: 2.2em; color: #00f0ff; letter-spacing: 2px; }
+h3 { color: #00f0ff; border-left: 5px solid #ff00aa; padding-left: 15px; margin-top: 30px; }
 
-/* ==== 成績單樣式 (Report) ==== */
-
-header {
-    border-bottom: 3px solid #00f0ff;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.report-title {
-    font-size: 2.2em;
-    font-weight: 700;
-    color: #00f0ff; /* 主標題使用螢光色 */
-    letter-spacing: 2px;
-}
-
-/* 區塊標題 */
-h3 {
-    color: #00f0ff;
-    border-left: 5px solid #ff00aa; /* 粉色強調線 */
-    padding-left: 15px;
-    margin-top: 30px;
-    font-size: 1.4em;
-}
-
-/* 學生資訊區 */
+/* 學生資訊 (螢幕) */
 .info-section {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
+    gap: 20px;
 }
-.info-section div {
-    flex-basis: 30%;
-    padding: 10px;
-    border: 1px dashed #30363d;
-    background: #0d1117;
-    border-radius: 4px;
-}
-
-.info-section strong {
-    color: #ffffff;
-    font-weight: 600;
-}
-
-/* 總分總結區 */
-.summary-section {
+.info-section div { 
+    padding: 10px 0;
+    border: none;
+    background: transparent;
+    flex-grow: 1;
     text-align: center;
-    padding: 30px;
-    margin: 20px 0;
-    background: #0d1117;
-    border: 1px solid #ff00aa;
-    border-radius: 8px;
 }
 
-.summary-section h4 {
-    color: #ff00aa; /* 粉色強調 */
-    font-size: 1.2em;
-    margin-bottom: 10px;
-}
-
-.score {
-    font-size: 4.5em;
-    color: #00ff00; /* 綠色分數強調 */
-    font-weight: 900;
-    text-shadow: 0 0 8px rgba(0, 255, 0, 0.7);
-    line-height: 1;
-}
-
-/* 知識點分析表格 */
-.skill-table {
+/* 圖表容器 (螢幕) */
+.chart-container {
+    position: relative;
+    margin: 20px auto;
+    height: 350px;
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    font-size: 0.95em;
+    max-width: 600px;
 }
 
-.skill-table th, .skill-table td {
-    border: 1px solid #2d3640;
-    padding: 12px;
-    text-align: left;
-}
+/* 其他區塊 */
+.score { font-size: 4.5em; color: #00ff00; text-shadow: 0 0 8px rgba(0, 255, 0, 0.7); }
+.skill-table th { background-color: #00f0ff; color: #161b22; padding: 12px; }
+.level-high { color: #00ff00; }
+.level-medium { color: #ffff00; }
+.level-low { color: #ff0000; }
+.skill-table td { padding: 12px; }
 
-.skill-table th {
-    background-color: #00f0ff;
-    color: #161b22;
-    font-weight: bold;
-}
 
-/* 熟練度等級顏色 */
-.level-high { color: #00ff00; font-weight: bold; }
-.level-medium { color: #ffff00; font-weight: bold; }
-.level-low { color: #ff0000; font-weight: bold; }
+/* ========================================================= */
+/* 列印樣式 (PRINT Styles) - 佈局鎖定與最終美化 */
+/* ========================================================= */
 
-/* 評語區 */
-.assessment-section {
-    border-top: 1px dashed #ff00aa;
-    padding-top: 20px;
-    margin-top: 30px;
-}
+@media print {
+    /* 核心佈局設定 */
+    @page {
+        size: A4 portrait;
+        margin: 10mm; 
+    }
+    
+    .print-button, .form-container { display: none !important; }
+    
+    body {
+        background-color: #ffffff !important;
+        padding: 0; 
+        margin: 0;
+        color: #000000;
+    }
 
-.assessment-section p {
-    line-height: 1.8;
-}
-.assessment-section strong {
-    color: #ffffff;
+    /* 報告容器：居中與寬度限制 */
+    .report-container {
+        width: 90% !important; 
+        margin: 0 auto !important; 
+        padding: 0;
+        box-shadow: none;
+        border: none;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 10pt;
+        position: relative;
+        left: 0;
+        right: 0;
+    }
+
+    /* 確保所有需要背景色的元素強制列印顏色 */
+    .info-section, .skill-table th, .skill-table td {
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important;
+    }
+
+    /* 標題與間距 */
+    header { 
+        border-bottom: 2px solid #000; 
+        padding-bottom: 5px; 
+        margin-bottom: 5px; /* 縮小底部間距 */
+        text-align: center;
+    }
+    .report-title { 
+        font-size: 1.6em; 
+        color: #000 !important; 
+        letter-spacing: 1px;
+    }
+    
+    /* H3 標題 - 縮小上下邊距 */
+    h3 {
+        color: #000 !important;
+        border-left: 5px solid #000;
+        padding-left: 10px;
+        margin-top: 15px; /* 縮小頂部邊距 */
+        margin-bottom: 5px; /* 縮小底部邊距 */
+    }
+
+    /* 1. 學生資訊列 */
+    .info-section {
+        border: none; 
+        background-color: #f0f0f0 !important; 
+        margin-bottom: 5px; /* 縮小底部間距 */
+        padding: 3px 0; /* 縮小上下填充 */
+    }
+    .info-section div {
+        background-color: transparent !important; 
+        border: none;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    /* 總分 - 縮小填充 */
+    .summary-section {
+        padding: 5px; /* 縮小填充 */
+        margin: 3px 0; /* 縮小上下邊距 */
+        background: #f8f8f8;
+        text-align: center;
+    }
+    .score {
+        font-size: 2.2em; /* 輕微縮小分數文字大小 */
+        color: #000 !important;
+    }
+
+    /* 2. 【關鍵修復】圖表容器鎖定 - 保持穩定高度，縮小上下間距 */
+    .chart-container {
+        display: block !important;
+        height: 220px !important; /* 回退到 220px 穩定高度 */
+        width: 60% !important; 
+        margin: 10px auto 15px auto !important; /* 縮小上下間距 */
+        page-break-inside: avoid;
+    }
+    /* 確保 Canvas 填滿容器，防止瀏覽器繪製溢出 */
+    .chart-container canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    /* 3. 表格調整 - 框線與網底 */
+    .skill-table { 
+        font-size: 9.5pt;
+        width: 100%;
+        margin-top: 20px !important; /* 大幅縮小頂部間距 */
+        border-collapse: collapse;
+        border: 1px solid #000;
+    }
+
+    /* 表格標題列 - 黑底白字 */
+    .skill-table th { 
+        background-color: #000000 !important; 
+        color: #ffffff !important; 
+        border: 1px solid #000; 
+        padding: 4px; /* 縮小填充 */
+        text-align: center;
+    }
+    
+    /* 表格內容 - 淡灰色網底黑字 */
+    .skill-table td { 
+        padding: 4px; /* 縮小填充 */
+        border: 1px solid #000;
+        background-color: #f8f8f8 !important; 
+        color: #000 !important;
+        text-align: center;
+    }
+    
+    /* 知識點名稱那一列 (第一列) - 略深淺灰色網底 */
+    .skill-table td:first-child {
+        background-color: #e8e8e8 !important; 
+        text-align: left;
+    }
+
+    /* 4. 評語區 - 空間壓縮 */
+    .assessment-section {
+        margin-top: 10px; /* 縮小頂部間距 */
+        padding: 5px;
+        border: none;
+        border-radius: 0;
+        background: #fafafa;
+    }
+    .assessment-section p { 
+        line-height: 1.4; /* 縮小行距 */
+        text-align: justify;
+    }
+
+    /* 等級顏色轉為黑色加粗 */
+    .level-high, .level-medium, .level-low { 
+        color: #000 !important; 
+        font-weight: bold; 
+    }
+    
+    /* 防止分頁 */
+    .info-section, .summary-section, .chart-container, .skill-table, .assessment-section {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
 }
