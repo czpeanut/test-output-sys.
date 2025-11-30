@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>線上學科能力分析測驗</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="input-container" class="form-container">
+        <h2>學生資訊輸入</h2>
+        <input type="text" id="student-name" placeholder="姓名 (e.g. 王小明)">
+        <input type="text" id="student-school" placeholder="學校 (e.g. 科技高中)">
+        <select id="student-grade">
+            <option value="">選擇年級</option>
+            <option value="高一">高一</option>
+            <option value="高二">高二</option>
+            <option value="高三">高三</option>
+        </select>
+
+        <h2>答案輸入 (填入您的選項，如 A, B, C, D)</h2>
+        <div id="answers-form">
+            </div>
+
+        <button onclick="analyzeAndGenerateReport()">生成分析報告</button>
+    </div>
+
+    <div id="report-container" class="report-container hidden">
+        <header>
+            <div class="logo">ACADEMIC ANALYSIS REPORT</div>
+            <div class="report-title">學科能力深度評估報告</div>
+        </header>
+
+        <section id="student-info-display" class="info-section">
+            </section>
+
+        <section id="score-summary" class="summary-section">
+            </section>
+
+        <section id="knowledge-analysis" class="analysis-section">
+            <h3>:: 知識點熟練度分析 ::</h3>
+            <div id="skill-chart">
+                </div>
+        </section>
+
+        <section id="assessment-text" class="assessment-section">
+            <h3>:: 綜合能力評語 ::</h3>
+            <p id="assessment-message">正在分析中...</p>
+        </section>
+
+        <button class="print-button" onclick="window.print()">列印成績單</button>
+    </div>
+
+    <script src="quizData.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+/* 隱藏列印按鈕在列印模式下 */
+@media print {
+    .print-button {
+        display: none !important;
+    }
+    .form-container {
+        display: none !important;
+    }
+    .report-container {
+        /* 列印時移除邊距，讓內容填滿紙張 */
+        margin: 0;
+        box-shadow: none;
+        color: #000; /* 列印時文字改為黑色，以節省墨水並保證清晰度 */
+        background: #fff; /* 列印時背景改為白色 */
+    }
+    /* 列印時移除螢光色和深色背景 */
+    .report-title, h3, .score {
+        color: #111 !important; 
+        text-shadow: none !important;
+    }
+    .info-section div {
+        border: 1px solid #ccc;
+    }
+}
+
+/* 基礎設定 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0d1117; /* 深色背景 */
+    color: #c9d1d9; /* 淺灰色字體 */
+    padding: 20px;
+}
+
+/* 容器樣式 */
+.form-container, .report-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #161b22; /* 比背景稍淺的容器色 */
+    border: 2px solid #2d3640;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2); /* 科技感光暈 */
+    transition: all 0.5s ease;
+}
+
+.hidden {
+    display: none;
+}
+
+/* 輸入框和按鈕樣式 */
+input[type="text"], select {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #00f0ff; /* 螢光藍邊框 */
+    background: #0d1117;
+    color: #00f0ff;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus, select:focus {
+    border-color: #ff00aa;
+    box-shadow: 0 0 5px rgba(255, 0, 170, 0.5);
+}
+
+button {
+    background-color: #00f0ff;
+    color: #161b22;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #00cccc;
+}
+
+.print-button {
+    background-color: #ff00aa; /* 列印按鈕使用粉色 */
+    color: #fff;
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 30px auto 10px auto;
+}
+
+.print-button:hover {
+    background-color: #cc0088;
+}
+
+/* ==== 成績單樣式 (Report) ==== */
+
+header {
+    border-bottom: 3px solid #00f0ff;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.report-title {
+    font-size: 2.2em;
+    font-weight: 700;
+    color: #00f0ff; /* 主標題使用螢光色 */
+    letter-spacing: 2px;
+}
+
+/* 區塊標題 */
+h3 {
+    color: #00f0ff;
+    border-left: 5px solid #ff00aa; /* 粉色強調線 */
+    padding-left: 15px;
+    margin-top: 30px;
+    font-size: 1.4em;
+}
+
+/* 學生資訊區 */
+.info-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.info-section div {
+    flex-basis: 30%;
+    padding: 10px;
+    border: 1px dashed #30363d;
+    background: #0d1117;
+    border-radius: 4px;
+}
+
+.info-section strong {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* 總分總結區 */
+.summary-section {
+    text-align: center;
+    padding: 30px;
+    margin: 20px 0;
+    background: #0d1117;
+    border: 1px solid #ff00aa;
+    border-radius: 8px;
+}
+
+.summary-section h4 {
+    color: #ff00aa; /* 粉色強調 */
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.score {
+    font-size: 4.5em;
+    color: #00ff00; /* 綠色分數強調 */
+    font-weight: 900;
+    text-shadow: 0 0 8px rgba(0, 255, 0, 0.7);
+    line-height: 1;
+}
+
+/* 知識點分析表格 */
+.skill-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.95em;
+}
+
+.skill-table th, .skill-table td {
+    border: 1px solid #2d3640;
+    padding: 12px;
+    text-align: left;
+}
+
+.skill-table th {
+    background-color: #00f0ff;
+    color: #161b22;
+    font-weight: bold;
+}
+
+/* 熟練度等級顏色 */
+.level-high { color: #00ff00; font-weight: bold; }
+.level-medium { color: #ffff00; font-weight: bold; }
+.level-low { color: #ff0000; font-weight: bold; }
+
+/* 評語區 */
+.assessment-section {
+    border-top: 1px dashed #ff00aa;
+    padding-top: 20px;
+    margin-top: 30px;
+}
+
+.assessment-section p {
+    line-height: 1.8;
+}
+.assessment-section strong {
+    color: #ffffff;
+}
