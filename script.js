@@ -141,7 +141,7 @@ function analyzeAndGenerateReport() {
   document.getElementById('student-info-display').innerHTML = `
     <div>科目：${subjectName}</div>
     <div>姓名：${studentName}</div>
-    <div>年級：${studentGrade}</div>
+    <div>測驗項目：${studentGrade}</div>
     <div>學校：${studentSchool}</div>
   `;
 

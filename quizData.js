@@ -2,7 +2,7 @@
 // 目前只提供「國二」，結構已預留擴充。
 
 const allGradeData = {
-  "國二": {
+  "國二寒訓模考": {
     // ======================= 國文 =======================
     "國文": {
       maxScore: 210, // 42 題 × 5 分
@@ -200,7 +200,7 @@ const allGradeData = {
 };
 
 // =============== 題目輸入欄位初始化（由本檔建立） ===============
-const DEFAULT_GRADE = "國二";
+const DEFAULT_GRADE = "國二寒訓模考";
 const DEFAULT_SUBJECT = "國文";
 let quizData = null;
 
