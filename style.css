@@ -1,366 +1,134 @@
 /*
- * style.css
- * 深色輸入區 + 白底成績單 + 列印優化
+ * style.css - 深色輸入區 + 白底成績單 + 列印優化
  */
 
-:root {
-    --bg-color: #1a1a2e;
-    --card-color: #2c2c4d;
-    --text-color: #f0f0f0;
-    --primary-color: #00f0ff;
+:root{
+  --bg-color:#1a1a2e;
+  --card-color:#2c2c4d;
+  --text-color:#f0f0f0;
+  --primary-color:#00f0ff;
 }
 
-* {
-    box-sizing: border-box;
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  background-color:var(--bg-color);
+  color:var(--text-color);
+  padding:20px;
 }
 
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-        "Helvetica Neue", Arial, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei",
-        sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    padding: 20px;
+/* 表單容器 */
+.form-container{
+  max-width:900px; margin:0 auto 30px auto;
+  background-color:var(--card-color); padding:20px; border-radius:12px;
+  box-shadow:0 0 25px rgba(0,0,0,.45);
+}
+.form-container h2{ text-align:center; margin-top:0; }
+
+select,input[type="text"]{
+  width:100%; padding:10px; margin:8px 0;
+  border:1px solid #444; border-radius:8px; background:#333; color:var(--text-color);
 }
 
-/* 表單容器（輸入區：深色） */
-.form-container {
-    max-width: 900px;
-    margin: 0 auto 30px auto;
-    background-color: var(--card-color);
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.45);
+/* 題目輸入 */
+#answers-form{ display:block; margin-top:15px; }
+.question-group{
+  display:flex; align-items:center; background:#3e3e5c; border-radius:8px; padding:6px 10px; margin-bottom:6px;
 }
-
-.form-container h2 {
-    text-align: center;
-    margin-top: 0;
-}
-
-/* 輸入欄位與下拉選單 */
-select,
-input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border: 1px solid #444;
-    border-radius: 8px;
-    background-color: #333;
-    color: var(--text-color);
-    box-sizing: border-box;
-}
-
-/* 答案欄位：標準流動排列 */
-#answers-form {
-    display: block;
-    margin-top: 15px;
-}
-
-.question-group {
-    display: flex;
-    align-items: center;
-    background-color: #3e3e5c;
-    border-radius: 8px;
-    padding: 6px 10px;
-    margin-bottom: 6px;
-}
-
-.question-group label {
-    flex: 0 0 80px;
-    font-size: 0.95em;
-}
-
-.question-group input.answer-input {
-    flex: 1;
-    max-width: 70px;
-    padding: 6px;
-    font-size: 1em;
-    text-align: center;
-    border-radius: 6px;
-    border: 1px solid #666;
-    background-color: #222;
-    color: #fff;
+.question-group label{ flex:0 0 80px; font-size:.95em; }
+.question-group input.answer-input{
+  flex:1; max-width:70px; padding:6px; font-size:1em; text-align:center;
+  border-radius:6px; border:1px solid #666; background:#222; color:#fff;
 }
 
 /* 按鈕 */
-button {
-    display: block;
-    width: 100%;
-    margin-top: 18px;
-    padding: 12px;
-    font-size: 1.05em;
-    color: #fff;
-    background: linear-gradient(135deg, #00f0ff, #0077ff);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    letter-spacing: 0.05em;
-    box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+button{
+  display:block; width:100%; margin-top:18px; padding:12px; font-size:1.05em;
+  color:#fff; background:linear-gradient(135deg,#00f0ff,#0077ff);
+  border:none; border-radius:8px; cursor:pointer; font-weight:bold; letter-spacing:.05em;
+  box-shadow:0 0 16px rgba(0,240,255,.4);
+  transition:transform .1s ease, box-shadow .1s ease;
+}
+button:hover{ transform:translateY(-1px); box-shadow:0 0 20px rgba(0,240,255,.6); }
+button:active{ transform:translateY(0); box-shadow:0 0 8px rgba(0,240,255,.5); }
+
+/* 成績單（白底黑字） */
+.report-container{
+  max-width:900px; margin:0 auto; background:#fff; color:#000; padding:20px 24px 24px 24px;
+  border-radius:12px; box-shadow:0 0 25px rgba(0,0,0,.45);
+}
+.report-container header{
+  display:flex; align-items:baseline; justify-content:space-between; margin-bottom:20px;
+}
+.report-container .logo{
+  font-size:.9em; letter-spacing:.12em; text-transform:uppercase; color:#666;
+}
+.report-container .report-title{
+  font-size:1.4em; font-weight:bold; text-align:right; color:#000;
 }
 
-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+/* 學生資訊 */
+.info-section{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:10px; background:#f5f5f5; padding:12px 20px; border-radius:8px; margin-bottom:20px;
+  font-size:1em; color:#000;
 }
 
-button:active {
-    transform: translateY(0);
-    box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+/* 總結 */
+.summary-section{
+  text-align:center; margin-bottom:20px; border:1px dashed #999; border-radius:8px; padding:10px; background:#fafafa; color:#000;
+}
+.summary-section p{ margin:0; font-size:1.1em; font-weight:bold; color:#000; }
+.score{ font-size:3.2em; font-weight:900; margin-top:5px; color:#0077cc; }
+.score-extra{ margin-top:6px; color:#000; }
+
+/* 知識點 */
+.analysis-section{ margin-bottom:20px; }
+.analysis-section h3{ margin-top:0; color:#000; }
+.skill-table{ width:100%; border-collapse:collapse; color:#000; }
+.skill-table th,.skill-table td{ padding:6px 8px; border:1px solid #ccc; text-align:left; font-size:.95em; }
+.skill-table th{ background:#e0e0e0; color:#000; }
+.skill-table td.skill-name{ font-weight:600; color:#000; }
+
+/* 熟練度顏色（加深） */
+.level-high{ color:#064b00; }
+.level-medium{ color:#8a4d00; }
+.level-low{ color:#9b0018; }
+
+/* 評語 */
+.assessment-section{ margin-top:20px; padding:12px 16px; border-radius:8px; background:#f5f5f5; color:#000; }
+.assessment-section h3{ margin-top:0; color:#000; }
+
+/* 補習班標籤（置中＋較大） */
+.cram-school-label{ margin-top:18px; text-align:center; }
+.cram-school-label-text{
+  font-size:1.3rem; font-weight:700; letter-spacing:.08em; color:#222;
 }
 
-/* =================================================================
- * 成績單（白底黑字）
- * ================================================================= */
+/* 顯示/隱藏 */
+.hidden{ display:none; }
 
-/* 成績單主容器：白底＋黑字 */
-.report-container {
-    max-width: 900px;
-    margin: 0 auto;
-    background-color: #ffffff;
-    color: #000000;
-    padding: 20px 24px 24px 24px;
-    border-radius: 12px;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.45);
-}
+/* 列印 */
+@media print{
+  body{ font-size:12pt; background:#fff; color:#000; padding:0; line-height:1.2; }
+  .form-container,.print-button,button,.report-container.hidden{ display:none !important; }
 
-.report-container header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
+  #report-container{ display:block !important; box-shadow:none; border-radius:0; max-width:100%; margin:0; padding:10mm 12mm; }
+  .report-container header{ margin-bottom:10pt; }
+  .report-container .report-title{ font-size:14pt; }
+  .info-section{ padding:6pt 8pt; margin-bottom:10pt; font-size:10pt; background:#f5f5f5 !important; color:#000 !important; }
+  .summary-section{ margin-bottom:10pt; padding:6pt 8pt; }
+  .score{ font-size:24pt !important; }
+  .summary-section p{ font-size:10pt !important; }
 
-.report-container .logo {
-    font-size: 0.9em;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #666666;
-}
+  .skill-table th,.skill-table td{
+    padding:5pt 7pt !important; font-size:9pt !important; border-color:#ccc; color:#000;
+    -webkit-print-color-adjust:exact !important; color-adjust:exact !important;
+  }
+  .level-high,.level-medium,.level-low{ color:#000 !important; text-shadow:none !important; }
 
-.report-container .report-title {
-    font-size: 1.4em;
-    font-weight: bold;
-    text-align: right;
-    color: #000000;
-}
-
-/* 學生資訊區塊：淺灰底＋黑字 */
-.info-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 10px;
-    background-color: #f5f5f5;
-    padding: 12px 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 1em;
-    color: #000000;
-}
-
-/* 總分區塊 */
-.summary-section {
-    text-align: center;
-    margin-bottom: 20px;
-    border: 1px dashed #999999;
-    border-radius: 8px;
-    padding: 10px;
-    background-color: #fafafa;
-    color: #000000;
-}
-
-.summary-section p {
-    margin: 0;
-    font-size: 1.1em;
-    font-weight: bold;
-    color: #000000;
-}
-
-.score {
-    font-size: 3.2em;
-    font-weight: 900;
-    margin-top: 5px;
-    color: #0077cc;
-}
-
-/* 知識點分析區塊 */
-.analysis-section {
-    margin-bottom: 20px;
-}
-
-.analysis-section h3 {
-    margin-top: 0;
-    color: #000000;
-}
-
-/* 知識點表格 */
-.skill-table {
-    width: 100%;
-    border-collapse: collapse;
-    color: #000000;
-}
-
-.skill-table th,
-.skill-table td {
-    padding: 6px 8px;
-    border: 1px solid #cccccc;
-    text-align: left;
-    font-size: 0.95em;
-}
-
-.skill-table th {
-    background-color: #e0e0e0;
-    color: #000000;
-}
-
-.skill-table td.skill-name {
-    font-weight: 600;
-    color: #000000;
-}
-
-/* 熟練度顏色（較深） */
-.level-high {
-    color: #006400;
-    text-shadow: none;
-}
-
-.level-medium {
-    color: #b36b00;
-    text-shadow: none;
-}
-
-.level-low {
-    color: #b00020;
-    text-shadow: none;
-}
-
-/* 綜合評語區塊 */
-.assessment-section {
-    margin-top: 20px;
-    padding: 12px 16px;
-    border-radius: 8px;
-    background-color: #f5f5f5;
-    color: #000000;
-}
-
-.assessment-section h3 {
-    margin-top: 0;
-    color: #000000;
-}
-
-/* 成績單底部補習班標籤：置中＋字稍大＋黑字 */
-.cram-school-label {
-    margin-top: 18px;
-    text-align: center;
-}
-
-.cram-school-label-text {
-    font-size: 1.1rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: #222222;
-}
-
-/* 顯示／隱藏 */
-.hidden {
-    display: none;
-}
-
-/* =================================================================
- * 列印樣式
- * ================================================================= */
-@media print {
-    body {
-        font-size: 12pt; 
-        background-color: #ffffff;
-        color: #000000;
-        padding: 0;
-        line-height: 1.2;
-    }
-    
-    .form-container,
-    .print-button,
-    button,
-    .report-container.hidden {
-        display: none !important;
-    }
-
-    #report-container {
-        display: block !important;
-        box-shadow: none;
-        border-radius: 0;
-        max-width: 100%;
-        margin: 0;
-        padding: 10mm 12mm;
-    }
-
-    .report-container header {
-        margin-bottom: 10pt;
-    }
-
-    .report-container .report-title {
-        font-size: 14pt;
-    }
-
-    .info-section {
-        padding: 6pt 8pt;
-        margin-bottom: 10pt;
-        font-size: 10pt;
-        background-color: #f5f5f5 !important;
-        color: #000000 !important;
-    }
-
-    .summary-section {
-        margin-bottom: 10pt;
-        padding: 6pt 8pt;
-    }
-
-    .score {
-        font-size: 24pt !important;
-    }
-
-    .summary-section p {
-        font-size: 10pt !important;
-    }
-    
-    .skill-table th,
-    .skill-table td {
-        padding: 5pt 7pt !important;
-        font-size: 9pt !important;
-        border-color: #ccc;
-        color: #000000;
-        -webkit-print-color-adjust: exact !important; 
-        color-adjust: exact !important;
-    }
-    
-    .skill-table td.skill-name {
-        color: #000000 !important;
-    }
-
-    .level-high,
-    .level-medium,
-    .level-low {
-        color: #000000 !important;
-        text-shadow: none !important;
-    }
-
-    .cram-school-label {
-        margin-top: 8pt;
-        text-align: center !important;
-    }
-
-    .cram-school-label-text {
-        font-size: 10pt !important;
-        font-weight: 600 !important;
-        color: #000000 !important;
-        letter-spacing: 0.08em;
-    }
-
-    .report-container {
-        page-break-after: avoid;
-        page-break-inside: avoid;
-    }
+  .cram-school-label{ margin-top:8pt; text-align:center !important; }
+  .cram-school-label-text{ font-size:11pt !important; font-weight:700 !important; color:#000 !important; letter-spacing:.08em; }
 }

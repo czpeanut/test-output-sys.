@@ -1,217 +1,205 @@
-// =================================================================
-// 輔助函數
-// =================================================================
-function getLevel(score) {
-    if (score >= 80) {
-        return `<span class="level-high">精通</span>`;
-    } else if (score >= 60) {
-        return `<span class="level-medium">熟練</span>`;
-    } else {
-        return `<span class="level-low">待加強</span>`;
-    }
+// script.js - 分析、等級判定、成績單渲染（無雷達圖）
+
+// ====== 熟練度標籤（知識點用；與 PDF 等級無關）======
+function getLevel(percentage) {
+  if (percentage >= 80) return `<span class="level-high">精通</span>`;
+  if (percentage >= 60) return `<span class="level-medium">熟練</span>`;
+  return `<span class="level-low">待加強</span>`;
 }
 
-// 用在表格的背景顏色（熱力效果）
-function getBackgroundColor(score) {
-    const hue = Math.round((score / 100) * 120); // 0=紅,120=綠
-    return `background-color: hsla(${hue}, 90%, 45%, 0.2);`;
+// 知識點百分比對應的淺色背景（熱力感）
+function getBackgroundColor(percentage) {
+  const hue = Math.round((percentage / 100) * 120); // 0=紅, 120=綠
+  return `background-color: hsla(${hue}, 90%, 45%, 0.20);`;
 }
 
-// =================================================================
-// 主函數：生成報告（不再產生雷達圖）
-// =================================================================
+// ====== 各科「等級」級距（依 PDF 第 2–6 頁；數學採推估） ======
+// 回傳字串：A++ / A+ / A / B++ / B+ / B / C
+function getGradeBand(subjectName, correctCount) {
+  // 國文：42 題（PDF 第 2 頁）
+  if (subjectName === "國文") {
+    if (correctCount >= 41) return "A++";
+    if (correctCount === 39 || correctCount === 40) return "A+";
+    if (correctCount >= 36) return "A";
+    if (correctCount >= 32) return "B++";
+    if (correctCount >= 28) return "B+";
+    if (correctCount >= 18) return "B";
+    return "C";
+  }
+
+  // 英文：43 題（PDF 第 3 頁）
+  if (subjectName === "英文") {
+    if (correctCount >= 42) return "A++";
+    if (correctCount === 41) return "A+";
+    if (correctCount >= 38) return "A";
+    if (correctCount >= 33) return "B++";
+    if (correctCount >= 28) return "B+";
+    if (correctCount >= 22) return "B";
+    return "C";
+  }
+
+  // 自然：50 題（PDF 第 5 頁）
+  if (subjectName === "自然") {
+    if (correctCount >= 48) return "A++";
+    if (correctCount === 47) return "A+";
+    if (correctCount >= 44) return "A";
+    if (correctCount >= 37) return "B++";
+    if (correctCount >= 28) return "B+";
+    if (correctCount >= 19) return "B";
+    return "C";
+  }
+
+  // 社會：54 題（PDF 第 6 頁）
+  if (subjectName === "社會") {
+    if (correctCount >= 52) return "A++";
+    if (correctCount >= 50) return "A+";
+    if (correctCount >= 47) return "A";
+    if (correctCount >= 41) return "B++";
+    if (correctCount >= 34) return "B+";
+    if (correctCount >= 21) return "B";
+    return "C";
+  }
+
+  // 數學：PDF 第 4 頁之級距含非選題；本系統僅採 25 題選擇題 → 採等比例推估級距
+  // 推估：A++ 24–25, A+ 23, A 21–22, B++ 17–20, B+ 13–16, B 9–12, C 0–8
+  if (subjectName === "數學") {
+    if (correctCount >= 24) return "A++";
+    if (correctCount === 23) return "A+";
+    if (correctCount >= 21) return "A";
+    if (correctCount >= 17) return "B++";
+    if (correctCount >= 13) return "B+";
+    if (correctCount >= 9) return "B";
+    return "C";
+  }
+
+  // 其他（保險）
+  return "—";
+}
+
+// ====== 主分析流程（無雷達圖）======
 function analyzeAndGenerateReport() {
-    if (typeof quizData === 'undefined' || !quizData || !quizData.questions) {
-        alert("錯誤：找不到測驗數據，請先選擇科目！");
-        return;
+  if (typeof quizData === 'undefined' || !quizData || !quizData.questions) {
+    alert("錯誤：找不到測驗數據，請先選擇科目！");
+    return;
+  }
+
+  // 1) 讀基本資料
+  const subjectName   = document.getElementById('subject-name').value;
+  const studentName   = document.getElementById('student-name').value.trim();
+  const studentSchool = document.getElementById('student-school').value.trim();
+  const studentGrade  = document.getElementById('student-grade').value;
+  const cramSchool    = (document.getElementById('cram-school')?.value || "").trim();
+
+  if (!subjectName || !studentName || !studentSchool || !studentGrade || !cramSchool) {
+    alert("請選擇科目、補習班名稱，並填寫完整的學生資訊！");
+    return;
+  }
+
+  // 2) 收集作答
+  const inputs = Array.from(document.querySelectorAll('#answers-form .answer-input'));
+  let studentAnswers = '';
+  inputs.forEach(inp => { studentAnswers += (inp.value || '').trim().toUpperCase(); });
+
+  if (studentAnswers.length < quizData.questions.length) {
+    alert(`錯誤：尚未回答所有題目 (${studentAnswers.length}/${quizData.questions.length})，請檢查是否有遺漏！`);
+    return;
+  }
+
+  // 3) 計分
+  let totalScore = 0;
+  let correctCount = 0;
+
+  const skillScores = {};
+  const skillMaxScores = {};
+  quizData.skills.forEach(s => { skillScores[s]=0; skillMaxScores[s]=0; });
+
+  quizData.questions.forEach((q, i) => {
+    const ans = studentAnswers[i];
+    const perSkill = q.weight / q.skill.length;
+
+    if (ans === q.correct) {
+      totalScore += q.weight;
+      correctCount += 1;
+      q.skill.forEach(s => { skillScores[s] += perSkill; });
     }
+    q.skill.forEach(s => { skillMaxScores[s] += perSkill; });
+  });
 
-    // 1. 取得基本資料
-    const subjectName = document.getElementById('subject-name').value;
-    const studentName = document.getElementById('student-name').value.trim();
-    const studentSchool = document.getElementById('student-school').value.trim();
-    const studentGrade = document.getElementById('student-grade').value;
-    const cramSchoolEl = document.getElementById('cram-school');
-    const cramSchool = cramSchoolEl ? cramSchoolEl.value : '';
+  // 4) 知識點百分比
+  const skillRaw = quizData.skills.map(s => {
+    const score = skillScores[s] || 0;
+    const max   = skillMaxScores[s] || 1;
+    const pct   = Math.round((score / max) * 100);
+    return { name:s, percentage:pct, level:getLevel(pct) };
+  }).sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
 
-    if (!subjectName || !studentName || !studentSchool || !studentGrade || !cramSchool) {
-        alert("請選擇科目、補習班名稱，並填寫完整的學生資訊！");
-        return;
-    }
-    
-    // 2. 收集答案：從所有 .answer-input 取出（按順序）
-    const flowInputs = document.querySelectorAll('#answers-form .answer-input');
-    let studentAnswers = '';
-    
-    flowInputs.forEach(input => {
-        studentAnswers += (input.value || '').trim().toUpperCase();
-    });
+  // 5) 等級（依 PDF；數學為推估）
+  const gradeBand = getGradeBand(subjectName, correctCount);
 
-    if (studentAnswers.length < quizData.questions.length) {
-        alert(`錯誤：尚未回答所有題目 (${studentAnswers.length}/${quizData.questions.length})，請檢查是否有遺漏！`);
-        return;
-    }
+  // 6) 渲染基本資訊
+  document.getElementById('report-subject-title').innerText = `${subjectName}學科能力深度評估報告`;
+  document.getElementById('student-info-display').innerHTML = `
+    <div>科目：${subjectName}</div>
+    <div>姓名：${studentName}</div>
+    <div>年級：${studentGrade}</div>
+    <div>學校：${studentSchool}</div>
+  `;
 
-    // 3. 核心分數分析
-    let totalScore = 0;
-    let skillScores = {};     // 各知識點實得分
-    let skillMaxScores = {};  // 各知識點滿分
-    let skillWeights = {};    // 各知識點權重（目前等同滿分）
+  // 7) 總結卡片（顯示總分、作答數、等級）
+  const totalItems = quizData.questions.length;
+  document.getElementById('score-summary').innerHTML = `
+    <p>總學科能力分數</p>
+    <div class="score">${totalScore}</div>
+    <div class="score-extra">
+      答對題數：${correctCount} / ${totalItems}　|　等級：<strong>${gradeBand}</strong>
+    </div>
+  `;
 
-    quizData.skills.forEach(skill => {
-        skillScores[skill] = 0;
-        skillMaxScores[skill] = 0;
-        skillWeights[skill] = 0;
-    });
+  // 8) 兩欄知識點表格
+  let tbodyHTML = '';
+  for (let i=0; i<skillRaw.length; i+=2) {
+    const a = skillRaw[i], b = skillRaw[i+1];
+    const row = [
+      `<td class="skill-name" style="${getBackgroundColor(a.percentage)}">${a.name} (${a.percentage}%)</td>`,
+      `<td>${a.level}</td>`,
+      b ? `<td class="skill-name" style="${getBackgroundColor(b.percentage)}">${b.name} (${b.percentage}%)</td>` : '<td></td>',
+      b ? `<td>${b.level}</td>` : '<td></td>'
+    ].join('');
+    tbodyHTML += `<tr>${row}</tr>`;
+  }
+  const bodyEl = document.getElementById('skill-table-body-two-columns');
+  if (bodyEl) bodyEl.innerHTML = tbodyHTML;
 
-    quizData.questions.forEach((q, index) => {
-        const userAnswer = studentAnswers[index];
-        const numSkills = q.skill.length;
-        const skillWeightContribution = q.weight / numSkills; 
-        
-        if (userAnswer === q.correct) {
-            totalScore += q.weight; 
-            q.skill.forEach(skill => {
-                skillScores[skill] += skillWeightContribution;
-            });
-        }
-        
-        q.skill.forEach(skill => {
-            skillMaxScores[skill] += skillWeightContribution;
-            skillWeights[skill] += skillWeightContribution;
-        });
-    });
+  // 9) 綜合評語
+  const strong = skillRaw.filter(s=>s.percentage>=80).map(s=>s.name);
+  const weak   = skillRaw.filter(s=>s.percentage<60).map(s=>s.name);
+  let msg = `本次 ${subjectName} 測驗總分 ${totalScore} 分，答對 ${correctCount} 題，等級為 ${gradeBand}。`;
+  if (strong.length) msg += ` 表現較佳：${strong.join("、")}。`;
+  if (weak.length)   msg += ` 建議優先加強：${weak.join("、")}。`;
+  if (!weak.length)  msg += ` 各知識點掌握度均達及格以上，建議持續維持練習以鞏固實力。`;
+  document.getElementById('assessment-message').innerText = msg;
 
-    // 4. 統整成每個知識點的百分比
-    const skillRawData = quizData.skills.map(skill => {
-        const score = skillScores[skill];
-        const maxScore = skillMaxScores[skill] || 1; 
-        const percentage = Math.round((score / maxScore) * 100);
-        return {
-            name: skill,
-            score,
-            maxScore,
-            percentage,
-            level: getLevel(percentage)
-        };
-    });
+  // 10) 補習班標籤
+  const label = document.getElementById('cram-school-label');
+  if (label) label.innerHTML = `<span class="cram-school-label-text">${cramSchool}文理</span>`;
 
-    const overallScore = totalScore;
-
-    // 依知識點名稱排序，填表用
-    const skillDataForTable = skillRawData
-        .slice()
-        .sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant'));
-
-    let tableBodyHtml = '';
-    for (let i = 0; i < skillDataForTable.length; i += 2) {
-        const item1 = skillDataForTable[i];
-        const item2 = skillDataForTable[i + 1];
-
-        const color1 = getBackgroundColor(item1.percentage);
-        const color2 = item2 ? getBackgroundColor(item2.percentage) : '';
-
-        let rowHtml = '<tr>';
-        rowHtml += `
-            <td class="skill-name" style="${color1}">${item1.name} (${item1.percentage}%)</td>
-            <td>${item1.level}</td>
-        `;
-        if (item2) {
-            rowHtml += `
-                <td class="skill-name" style="${color2}">${item2.name} (${item2.percentage}%)</td>
-                <td>${item2.level}</td>
-            `;
-        } else {
-            rowHtml += '<td></td><td></td>';
-        }
-        rowHtml += '</tr>';
-        tableBodyHtml += rowHtml;
-    }
-
-    // 5. 更新報告內容（基本資料）
-    const studentInfo = `
-        <div>科目：${subjectName}</div>
-        <div>姓名：${studentName}</div>
-        <div>年級：${studentGrade}</div>
-        <div>學校：${studentSchool}</div>
-    `;
-    document.getElementById('student-info-display').innerHTML = studentInfo;
-
-    // 補習班標籤：小字「補習班名稱＋文理」
-    const cramLabelEl = document.getElementById('cram-school-label');
-    if (cramLabelEl) {
-        cramLabelEl.innerHTML = `<span class="cram-school-label-text">${cramSchool}文理</span>`;
-    }
-
-    document.getElementById('report-subject-title').innerText =
-        `${subjectName}學科能力深度評估報告`;
-    document.getElementById('h3-knowledge-analysis').innerText =
-        `:: 知識點熟練度分析 ::`;
-    
-    document.getElementById('score-summary').innerHTML = `
-        <p>總學科能力分數</p>
-        <div class="score">${overallScore}</div>
-    `;
-
-    const skillTableBody = document.getElementById('skill-table-body-two-columns');
-    if (skillTableBody) {
-        skillTableBody.innerHTML = tableBodyHtml;
-    }
-
-    // 6. 產生「綜合能力評語」──改為正常句子，不再有奇怪符號
-    const strongSkills = skillRawData
-        .filter(s => s.percentage >= 80)
-        .map(s => s.name);
-    const weakSkills = skillRawData
-        .filter(s => s.percentage < 60)
-        .map(s => s.name);
-
-    let assessmentText = `本次 ${subjectName} 測驗，總分為 ${overallScore} 分。`;
-
-    if (strongSkills.length > 0) {
-        assessmentText += ` 表現較佳的領域有：${strongSkills.join("、")}。`;
-    }
-
-    if (weakSkills.length > 0) {
-        assessmentText += ` 建議優先加強：${weakSkills.join("、")}，可從題目解析與相關練習著手，加強解題觀念。`;
-    } else {
-        assessmentText += ` 各知識點掌握度均達到及格以上，建議持續維持穩定練習，以鞏固既有實力。`;
-    }
-
-    document.getElementById('assessment-message').innerText = assessmentText;
-
-    // 7. 顯示報告頁面
-    document.getElementById('input-container').classList.add('hidden');
-    document.getElementById('report-container').classList.remove('hidden');
-    document.getElementById('report-container').scrollIntoView({ behavior: 'smooth' });
+  // 11) 切換畫面
+  document.getElementById('input-container').classList.add('hidden');
+  document.getElementById('report-container').classList.remove('hidden');
+  document.getElementById('report-container').scrollIntoView({behavior:'smooth'});
 }
 
-// =================================================================
-// 答案輸入欄位自動跳格（A～E）
-// =================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    const answersForm = document.getElementById('answers-form');
-    if (!answersForm) return;
-
-    document.addEventListener('input', (event) => {
-        const target = event.target;
-        if (!target.classList.contains('answer-input')) return;
-
-        const val = target.value.toUpperCase();
-        if (val.length === 1 && /[A-E]/.test(val)) {
-            target.value = val;
-            const inputs = Array.from(document.querySelectorAll('#answers-form .answer-input'));
-            const index = inputs.indexOf(target);
-            const next = inputs[index + 1];
-
-            if (next) {
-                next.focus();
-                next.select();
-            } else {
-                // 最後一題 → 跳到按鈕
-                const btn = document.getElementById('generate-report-btn');
-                if (btn) btn.focus();
-            }
-        }
-    });
+// ====== 輸入框自動跳格（A~E）======
+document.addEventListener('input', (ev) => {
+  const el = ev.target;
+  if (!el.classList || !el.classList.contains('answer-input')) return;
+  const v = (el.value || '').toUpperCase();
+  if (v.length === 1 && /[A-E]/.test(v)) {
+    el.value = v;
+    const inputs = Array.from(document.querySelectorAll('#answers-form .answer-input'));
+    const idx = inputs.indexOf(el);
+    const next = inputs[idx+1];
+    if (next) { next.focus(); next.select(); }
+    else document.getElementById('generate-report-btn')?.focus();
+  }
 });

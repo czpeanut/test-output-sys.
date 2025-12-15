@@ -1,93 +1,87 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>線上學科能力分析測驗</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>線上學科能力分析測驗</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-    <div id="input-container" class="form-container">
-        <h2>學生資訊輸入</h2>
-        
-        <!-- 科目選單：選項與變換邏輯由 quizData.js 動態處理 -->
-        <select id="subject-name">
-            <option value="">選擇科目</option>
-        </select>
-        
-        <!-- 年級目前固定「國二」 -->
-        <select id="student-grade">
-            <option value="國二">國二</option>
-        </select>
-        
-        <input type="text" id="student-name" placeholder="姓名 (e.g. 王小明)">
-        <input type="text" id="student-school" placeholder="學校 (e.g. XX國中)">
+  <div id="input-container" class="form-container">
+    <h2>學生資訊輸入</h2>
 
-        <!-- 補習班名稱選單 -->
-        <select id="cram-school">
-            <option value="">選擇補習班名稱</option>
-            <option value="學城">學城</option>
-            <option value="學築">學築</option>
-            <option value="達睿">達睿</option>
-            <option value="達陣">達陣</option>
-            <option value="達學">達學</option>
-            <option value="逸學">逸學</option>
-            <option value="粹學">粹學</option>
-        </select>
-        
-        <h2>答案輸入（輸入 A～E 單個字元後會自動跳轉）</h2>
-        <div id="answers-form">
-            <p style="text-align: center; color: #888;">請先選擇科目</p>
-        </div>
+    <!-- 科目選單（由 quizData.js 動態填入） -->
+    <select id="subject-name">
+      <option value="">選擇科目</option>
+    </select>
 
-        <button id="generate-report-btn" onclick="analyzeAndGenerateReport()">生成分析報告</button>
+    <!-- 年級目前固定國二，預留擴充 -->
+    <select id="student-grade">
+      <option value="國二">國二</option>
+    </select>
+
+    <input type="text" id="student-name" placeholder="姓名 (e.g. 王小明)"/>
+    <input type="text" id="student-school" placeholder="學校 (e.g. XX國中)"/>
+
+    <!-- 補習班名稱 -->
+    <select id="cram-school">
+      <option value="">選擇補習班名稱</option>
+      <option value="學城">學城</option>
+      <option value="學築">學築</option>
+      <option value="達睿">達睿</option>
+      <option value="達陣">達陣</option>
+      <option value="達學">達學</option>
+      <option value="逸學">逸學</option>
+      <option value="粹學">粹學</option>
+    </select>
+
+    <h2>答案輸入（輸入 A～E 後自動跳格）</h2>
+    <div id="answers-form">
+      <p style="text-align:center;color:#888;">請先選擇科目</p>
     </div>
 
-    <div id="report-container" class="report-container hidden">
-        <header>
-            <div class="logo">ACADEMIC ANALYSIS REPORT</div>
-            <div class="report-title" id="report-subject-title">學科能力深度評估報告</div>
-        </header>
+    <button id="generate-report-btn" onclick="analyzeAndGenerateReport()">生成分析報告</button>
+  </div>
 
-        <section id="student-info-display" class="info-section"></section>
+  <div id="report-container" class="report-container hidden">
+    <header>
+      <div class="logo">ACADEMIC ANALYSIS REPORT</div>
+      <div class="report-title" id="report-subject-title">學科能力深度評估報告</div>
+    </header>
 
-        <section id="score-summary" class="summary-section"></section>
+    <section id="student-info-display" class="info-section"></section>
 
-        <section id="knowledge-analysis" class="analysis-section">
-            <h3 id="h3-knowledge-analysis">:: 知識點熟練度分析 ::</h3>
+    <section id="score-summary" class="summary-section"></section>
 
-            <!-- 只保留表格，不要雷達圖 -->
-            <div id="skill-chart">
-                <table class="skill-table" style="width: 100%;">
-                    <thead>
-                        <tr>
-                            <th>知識點</th>
-                            <th>掌握程度</th>
-                            <th>知識點</th>
-                            <th>掌握程度</th>
-                        </tr>
-                    </thead>
-                    <tbody id="skill-table-body-two-columns">
-                    </tbody>
-                </table>
-            </div>
-        </section>
+    <section id="knowledge-analysis" class="analysis-section">
+      <h3 id="h3-knowledge-analysis">:: 知識點熟練度分析 ::</h3>
+      <!-- 僅表格，無雷達圖 -->
+      <div id="skill-chart">
+        <table class="skill-table" style="width:100%;">
+          <thead>
+            <tr>
+              <th>知識點</th><th>掌握程度</th>
+              <th>知識點</th><th>掌握程度</th>
+            </tr>
+          </thead>
+          <tbody id="skill-table-body-two-columns"></tbody>
+        </table>
+      </div>
+    </section>
 
-        <section id="assessment-text" class="assessment-section">
-            <h3>:: 綜合能力評語 ::</h3>
-            <p id="assessment-message">正在分析中...</p>
-        </section>
+    <section id="assessment-text" class="assessment-section">
+      <h3>:: 綜合能力評語 ::</h3>
+      <p id="assessment-message">正在分析中...</p>
+    </section>
 
-        <!-- 成績單底部的補習班標籤 -->
-        <section id="cram-school-label" class="cram-school-label">
-            <!-- 由 script.js 動態填入，如：學城文理 -->
-        </section>
+    <!-- 成績單底部補習班標籤 -->
+    <section id="cram-school-label" class="cram-school-label"></section>
 
-        <button class="print-button" onclick="window.print()">列印成績單</button>
-    </div>
+    <button class="print-button" onclick="window.print()">列印成績單</button>
+  </div>
 
-    <script src="quizData.js"></script>
-    <script src="script.js"></script>
+  <script src="quizData.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
