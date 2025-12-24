@@ -13,9 +13,44 @@ function getBackgroundColor(percentage) {
   return `background-color: hsla(${hue}, 90%, 45%, 0.20);`;
 }
 
-// ====== 各科「等級」級距（依 PDF 第 2–6 頁；數學採推估） ======
-// 回傳字串：A++ / A+ / A / B++ / B+ / B / C
-function getGradeBand(subjectName, correctCount) {
+/**
+ * ====== 等級級距判定（支援「每個測驗」各自一套級距）======
+ *
+ * 優先使用：allGradeData[studentGrade].gradeBands[subjectName]
+ *  - 支援兩種模式：
+ *    1) mode: "correct"  -> 用 correctCount 判定（傳統：看答對題數）
+ *    2) mode: "score"    -> 用 totalScore  判定（建議數學含非選時用）
+ *
+ * gradeBands 格式範例：
+ * allGradeData["國三第一次模考"].gradeBands = {
+ *   "數學": { mode:"score", thresholds:{ "A++":95, "A+":90, "A":80, "B++":70, "B+":60, "B":50 } },
+ *   "國文": { mode:"correct", thresholds:{ "A++":41, "A+":39, "A":36, "B++":32, "B+":28, "B":18 } }
+ * }
+ *
+ * 回傳字串：A++ / A+ / A / B++ / B+ / B / C / —
+ */
+function getGradeBand(studentGrade, subjectName, correctCount, totalScore) {
+  const order = ['A++', 'A+', 'A', 'B++', 'B+', 'B'];
+
+  // ---- 1) 優先：讀取「該測驗」的級距設定 ----
+  const cfg = allGradeData?.[studentGrade]?.gradeBands?.[subjectName];
+  if (cfg) {
+    // 允許寫成 {A++:xx, A+:xx, ...}（預設視為 correct 模式）
+    const mode = (typeof cfg.mode === 'string') ? cfg.mode : 'correct';
+    const thresholds = cfg.thresholds ? cfg.thresholds : cfg;
+
+    const v = (mode === 'score') ? Number(totalScore) : Number(correctCount);
+    if (!Number.isFinite(v)) return '—';
+
+    for (const band of order) {
+      const minVal = Number(thresholds[band]);
+      if (Number.isFinite(minVal) && v >= minVal) return band;
+    }
+    return 'C';
+  }
+
+  // ---- 2) 相容舊版：如果你還沒在 quizData.js 填 gradeBands，就走原本寫死的規則 ----
+
   // 國文：42 題（PDF 第 2 頁）
   if (subjectName === "國文") {
     if (correctCount >= 41) return "A++";
@@ -60,8 +95,7 @@ function getGradeBand(subjectName, correctCount) {
     return "C";
   }
 
-  // 數學：PDF 第 4 頁之級距含非選題；本系統僅採 25 題選擇題 → 採等比例推估級距
-  // 推估：A++ 24–25, A+ 23, A 21–22, B++ 17–20, B+ 13–16, B 9–12, C 0–8
+  // 數學：舊版推估（你後續補非選時，建議改用「score」模式的 gradeBands）
   if (subjectName === "數學") {
     if (correctCount >= 24) return "A++";
     if (correctCount === 23) return "A+";
@@ -72,7 +106,6 @@ function getGradeBand(subjectName, correctCount) {
     return "C";
   }
 
-  // 其他（保險）
   return "—";
 }
 
@@ -105,7 +138,7 @@ function analyzeAndGenerateReport() {
     return;
   }
 
-  // 3) 計分
+  // 3) 計分（維持原本邏輯：答對加 weight；答錯 0 分）
   let totalScore = 0;
   let correctCount = 0;
 
@@ -118,7 +151,7 @@ function analyzeAndGenerateReport() {
     const perSkill = q.weight / q.skill.length;
 
     if (ans === q.correct) {
-      totalScore += q.weight;
+      totalScore += q.weight;     // 你的「非選每題 3/2 分」只要 weight=1.5 就會自然成立
       correctCount += 1;
       q.skill.forEach(s => { skillScores[s] += perSkill; });
     }
@@ -133,8 +166,8 @@ function analyzeAndGenerateReport() {
     return { name:s, percentage:pct, level:getLevel(pct) };
   }).sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
 
-  // 5) 等級（依 PDF；數學為推估）
-  const gradeBand = getGradeBand(subjectName, correctCount);
+  // 5) 等級：改成可依「測驗項目」分開（必要改動）
+  const gradeBand = getGradeBand(studentGrade, subjectName, correctCount, totalScore);
 
   // 6) 渲染基本資訊
   document.getElementById('report-subject-title').innerText = `${subjectName}學科能力深度評估報告`;
@@ -198,8 +231,9 @@ document.addEventListener('input', (ev) => {
     el.value = v;
     const inputs = Array.from(document.querySelectorAll('#answers-form .answer-input'));
     const idx = inputs.indexOf(el);
-    const next = inputs[idx+1];
-    if (next) { next.focus(); next.select(); }
-    else document.getElementById('generate-report-btn')?.focus();
+    const next = inputs[idx + 1];
+    if (next) next.focus();
+  } else {
+    el.value = v.replace(/[^A-E]/g, '');
   }
 });
