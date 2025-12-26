@@ -3934,7 +3934,7 @@ const allGradeData = {
       ]
     }
   },
-  "國二寒訓模考": {
+  "國二學科聯合模擬會考挑戰": {
     "gradeBands": {
       "國文": {
         "A++": 41,
@@ -5858,7 +5858,7 @@ const allGradeData = {
 // 注意：本專案的 index.html 使用 #student-grade / #subject-name / #answers-form
 // 以及 script.js 會在 DOMContentLoaded 時呼叫 initializeForm（若存在）。
 
-const DEFAULT_GRADE = "國二寒訓模考";
+const DEFAULT_GRADE = "國二學科聯合模擬會考挑戰";
 const DEFAULT_SUBJECT = "國文";
 
 let quizData = null;
@@ -5982,3 +5982,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 讓 script.js 可以用全域變數拿到資料
 window.allGradeData = allGradeData;
+
