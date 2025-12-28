@@ -181,11 +181,11 @@ function analyzeAndGenerateReport() {
   // 7) 總結卡片（顯示總分、作答數、等級）
   const totalItems = quizData.questions.length;
   document.getElementById('score-summary').innerHTML = `
-    <p>總學科能力分數</p>
-    <div class="score">${totalScore}</div>
+    <p>總學科能力等級</p>
+    <div class="score">${gradeBand}</div>
     <div class="score-extra">
-      答對題數：${correctCount} / ${totalItems}　|　等級：<strong>${gradeBand}</strong>
-    </div>
+      答對題數：${correctCount} / ${totalItems}
+      </div>
   `;
 
   // 8) 兩欄知識點表格
@@ -237,3 +237,4 @@ document.addEventListener('input', (ev) => {
     el.value = v.replace(/[^A-E]/g, '');
   }
 });
+
