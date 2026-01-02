@@ -3973,13 +3973,73 @@ const allGradeData = {
         "C": 0
       },
       "數學": {
-        "A++": 23,
-        "A+": 21,
-        "A": 18,
-        "B++": 15,
-        "B+": 12,
-        "B": 9
-  }
+        "mode": "nonChoiceCorrect",
+        "nonChoiceBands": {
+          "0": {
+            "A++": 26,
+            "A+": 26,
+            "A": 23,
+            "B++": 20,
+            "B+": 17,
+            "B": 12,
+            "C": 0
+          },
+          "1": {
+            "A++": 26,
+            "A+": 25,
+            "A": 22,
+            "B++": 19,
+            "B+": 16,
+            "B": 11,
+            "C": 0
+          },
+          "2": {
+            "A++": 26,
+            "A+": 24,
+            "A": 21,
+            "B++": 18,
+            "B+": 16,
+            "B": 10,
+            "C": 0
+          },
+          "3": {
+            "A++": 25,
+            "A+": 23,
+            "A": 21,
+            "B++": 18,
+            "B+": 15,
+            "B": 10,
+            "C": 0
+          },
+          "4": {
+            "A++": 24,
+            "A+": 23,
+            "A": 20,
+            "B++": 17,
+            "B+": 14,
+            "B": 9,
+            "C": 0
+          },
+          "5": {
+            "A++": 24,
+            "A+": 22,
+            "A": 19,
+            "B++": 16,
+            "B+": 14,
+            "B": 8,
+            "C": 0
+          },
+          "6": {
+            "A++": 23,
+            "A+": 21,
+            "A": 18,
+            "B++": 16,
+            "B+": 13,
+            "B": 7,
+            "C": 0
+          }
+        }
+      }
     },
     "國文": {
       "maxScore": 210,
@@ -5919,6 +5979,18 @@ function populateSubjectsForGrade(gradeName, subjectSelect) {
   });
 }
 
+function toggleMathNonChoiceField(subjectName) {
+  const container = document.getElementById('math-nonchoice-container');
+  if (!container) return;
+  if (subjectName === "數學") {
+    container.classList.remove('hidden');
+    return;
+  }
+  container.classList.add('hidden');
+  const input = document.getElementById('math-nonchoice-score');
+  if (input) input.value = '';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const gradeSelect = document.getElementById('student-grade');
   const subjectSelect = document.getElementById('subject-name');
@@ -5949,6 +6021,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   quizData = allGradeData?.[initGrade]?.[initSubject] || null;
   initializeForm();
+  toggleMathNonChoiceField(initSubject);
 
   // 切年級：重載科目與題目
   gradeSelect.addEventListener('change', (e) => {
@@ -5957,6 +6030,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     subjectSelect.value = '';
     quizData = null;
+    toggleMathNonChoiceField('');
 
     const answersForm = document.getElementById('answers-form');
     if (answersForm) answersForm.innerHTML = '<p style="text-align:center;color:#888;">請先選擇科目</p>';
@@ -5970,6 +6044,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const allSubjectData = allGradeData?.[gradeName];
     if (!selectedSubject || !allSubjectData || !allSubjectData[selectedSubject]) {
       quizData = null;
+      toggleMathNonChoiceField('');
       const answersForm = document.getElementById('answers-form');
       if (answersForm) answersForm.innerHTML = '<p style="text-align:center;color:#888;">請先選擇科目</p>';
       return;
@@ -5977,6 +6052,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     quizData = allSubjectData[selectedSubject];
     initializeForm();
+    toggleMathNonChoiceField(selectedSubject);
   });
 });
 
