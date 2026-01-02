@@ -229,7 +229,7 @@ function analyzeAndGenerateReport() {
   // 9) 綜合評語
   const strong = skillRaw.filter(s=>s.percentage>=80).map(s=>s.name);
   const weak   = skillRaw.filter(s=>s.percentage<60).map(s=>s.name);
-  let msg = `本次 ${subjectName} 測驗總分 ${totalScore} 分，答對 ${correctCount} 題`;
+  let msg = `本次 ${subjectName} 答對 ${correctCount} 題`;
   if (subjectName === "數學") msg += `，非選題得分 ${nonChoiceScore} 分`;
   msg += `，等級為 ${gradeBand}。`;
   if (strong.length) msg += ` 表現較佳：${strong.join("、")}。`;
