@@ -35,28 +35,24 @@ function getBackgroundColor(percentage) {
  *
  * 回傳字串：A++ / A+ / A / B++ / B+ / B / C / —
  */
-function getMathNonChoiceBand(nonChoiceScore) {
-  if (!Number.isInteger(nonChoiceScore) || nonChoiceScore < 0 || nonChoiceScore > 6) return '—';
-  const bands = ['C', 'B', 'B+', 'B++', 'A', 'A+', 'A++'];
-  return bands[nonChoiceScore] || '—';
-}
-
 function getGradeBand(studentGrade, subjectName, correctCount, totalScore, nonChoiceScore) {
   const order = ['A++', 'A+', 'A', 'B++', 'B+', 'B'];
-
-  if (subjectName === "數學" && Number.isFinite(nonChoiceScore)) {
-    return getMathNonChoiceBand(nonChoiceScore);
-  }
 
   // ---- 1) 優先：讀取「該測驗」的級距設定 ----
   const cfg = allGradeData?.[studentGrade]?.gradeBands?.[subjectName];
   if (cfg) {
     // 允許寫成 {A++:xx, A+:xx, ...}（預設視為 correct 模式）
     const mode = (typeof cfg.mode === 'string') ? cfg.mode : 'correct';
-    const thresholds = cfg.thresholds ? cfg.thresholds : cfg;
+    let thresholds = cfg.thresholds ? cfg.thresholds : cfg;
+    let v = (mode === 'score') ? Number(totalScore) : Number(correctCount);
 
-    const v = (mode === 'score') ? Number(totalScore) : Number(correctCount);
-    if (!Number.isFinite(v)) return '—';
+    if (mode === 'nonChoiceCorrect') {
+      if (!Number.isInteger(nonChoiceScore)) return '—';
+      thresholds = cfg.nonChoiceBands?.[String(nonChoiceScore)];
+      v = Number(correctCount);
+    }
+
+    if (!thresholds || !Number.isFinite(v)) return '—';
 
     for (const band of order) {
       const minVal = Number(thresholds[band]);
