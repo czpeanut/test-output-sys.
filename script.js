@@ -29,8 +29,18 @@ function getBackgroundColor(percentage) {
  *
  * 回傳字串：A++ / A+ / A / B++ / B+ / B / C / —
  */
-function getGradeBand(studentGrade, subjectName, correctCount, totalScore) {
+function getMathNonChoiceBand(nonChoiceScore) {
+  if (!Number.isInteger(nonChoiceScore) || nonChoiceScore < 0 || nonChoiceScore > 6) return '—';
+  const bands = ['C', 'B', 'B+', 'B++', 'A', 'A+', 'A++'];
+  return bands[nonChoiceScore] || '—';
+}
+
+function getGradeBand(studentGrade, subjectName, correctCount, totalScore, nonChoiceScore) {
   const order = ['A++', 'A+', 'A', 'B++', 'B+', 'B'];
+
+  if (subjectName === "數學" && Number.isFinite(nonChoiceScore)) {
+    return getMathNonChoiceBand(nonChoiceScore);
+  }
 
   // ---- 1) 優先：讀取「該測驗」的級距設定 ----
   const cfg = allGradeData?.[studentGrade]?.gradeBands?.[subjectName];
@@ -122,10 +132,20 @@ function analyzeAndGenerateReport() {
   const studentSchool = document.getElementById('student-school').value.trim();
   const studentGrade  = document.getElementById('student-grade').value;
   const cramSchool    = (document.getElementById('cram-school')?.value || "").trim();
+  const mathNonChoiceInput = document.getElementById('math-nonchoice-score');
 
   if (!subjectName || !studentName || !studentSchool || !studentGrade || !cramSchool) {
     alert("請選擇科目、補習班名稱，並填寫完整的學生資訊！");
     return;
+  }
+
+  let nonChoiceScore = null;
+  if (subjectName === "數學") {
+    nonChoiceScore = Number(mathNonChoiceInput?.value);
+    if (!Number.isInteger(nonChoiceScore) || nonChoiceScore < 0 || nonChoiceScore > 6) {
+      alert("請輸入數學非選題得分（0～6 的整數）！");
+      return;
+    }
   }
 
   // 2) 收集作答
@@ -167,7 +187,7 @@ function analyzeAndGenerateReport() {
   }).sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
 
   // 5) 等級：改成可依「測驗項目」分開（必要改動）
-  const gradeBand = getGradeBand(studentGrade, subjectName, correctCount, totalScore);
+  const gradeBand = getGradeBand(studentGrade, subjectName, correctCount, totalScore, nonChoiceScore);
 
   // 6) 渲染基本資訊
   document.getElementById('report-subject-title').innerText = `${subjectName}學科能力深度評估報告`;
@@ -185,6 +205,7 @@ function analyzeAndGenerateReport() {
     <div class="score">${gradeBand}</div>
     <div class="score-extra">
       答對題數：${correctCount} / ${totalItems}
+      ${subjectName === "數學" ? `<br/>非選題得分：${nonChoiceScore} / 6` : ''}
       </div>
   `;
 
@@ -206,7 +227,9 @@ function analyzeAndGenerateReport() {
   // 9) 綜合評語
   const strong = skillRaw.filter(s=>s.percentage>=80).map(s=>s.name);
   const weak   = skillRaw.filter(s=>s.percentage<60).map(s=>s.name);
-  let msg = `本次 ${subjectName} 測驗總分 ${totalScore} 分，答對 ${correctCount} 題，等級為 ${gradeBand}。`;
+  let msg = `本次 ${subjectName} 測驗總分 ${totalScore} 分，答對 ${correctCount} 題`;
+  if (subjectName === "數學") msg += `，非選題得分 ${nonChoiceScore} 分`;
+  msg += `，等級為 ${gradeBand}。`;
   if (strong.length) msg += ` 表現較佳：${strong.join("、")}。`;
   if (weak.length)   msg += ` 建議優先加強：${weak.join("、")}。`;
   if (!weak.length)  msg += ` 各知識點掌握度均達及格以上，建議持續維持練習以鞏固實力。`;
