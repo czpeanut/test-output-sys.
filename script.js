@@ -20,10 +20,16 @@ function getBackgroundColor(percentage) {
  *  - 支援兩種模式：
  *    1) mode: "correct"  -> 用 correctCount 判定（傳統：看答對題數）
  *    2) mode: "score"    -> 用 totalScore  判定（建議數學含非選時用）
+ *    3) mode: "nonChoiceCorrect" -> 用非選得分對應的級距，再用 correctCount 判定
  *
  * gradeBands 格式範例：
  * allGradeData["國三第一次模考"].gradeBands = {
- *   "數學": { mode:"score", thresholds:{ "A++":95, "A+":90, "A":80, "B++":70, "B+":60, "B":50 } },
+ *   "數學": {
+ *     mode:"nonChoiceCorrect",
+ *     nonChoiceBands:{
+ *       "0": {"A++":26,"A+":26,"A":23,"B++":20,"B+":17,"B":12,"C":0}
+ *     }
+ *   },
  *   "國文": { mode:"correct", thresholds:{ "A++":41, "A+":39, "A":36, "B++":32, "B+":28, "B":18 } }
  * }
  *
