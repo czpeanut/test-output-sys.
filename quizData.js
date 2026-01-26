@@ -105,7 +105,7 @@ const allGradeData = {
           }
         }
       }
-    
+	} 
 },
     "國文": {
       "maxScore": 210,
@@ -1060,42 +1060,7 @@ const allGradeData = {
             "四邊形性質"
           ],
           "weight": 5
-        },
-        {
-          "id": 26,
-          "correct": "A",
-          "skill": [
-            "數的運算",
-            "數列規則"
-          ],
-          "weight": 5
-        },
-        {
-          "id": 27,
-          "correct": "A",
-          "skill": [
-            "數的運算",
-            "數列規則"
-          ],
-          "weight": 5
-        },
-        {
-          "id": 28,
-          "correct": "A",
-          "skill": [
-            "方程式列式",
-	    "等式不等式求解"
-          ],
-          "weight": 5
-        },
-        {
-          "id": 29,
-          "correct": "A",
-          "skill": [
-            "等式不等式求解"
-          ],
-          "weight": 5
-        }
+			}
       ]
     },
     "自然": {
@@ -2158,7 +2123,7 @@ const allGradeData = {
             "C": 0
           }
         }
-      
+	   }
     },
     "國文": {
       "maxScore": 210,
@@ -6113,6 +6078,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 讓 script.js 可以用全域變數拿到資料
 window.allGradeData = allGradeData;
+
 
 
 
