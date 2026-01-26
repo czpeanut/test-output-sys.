@@ -105,7 +105,7 @@ const allGradeData = {
           }
         }
       }
-    }
+    
 },
     "國文": {
       "maxScore": 210,
@@ -2158,7 +2158,7 @@ const allGradeData = {
             "C": 0
           }
         }
-      }
+      
     },
     "國文": {
       "maxScore": 210,
@@ -6113,6 +6113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 讓 script.js 可以用全域變數拿到資料
 window.allGradeData = allGradeData;
+
 
 
 
