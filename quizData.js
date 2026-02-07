@@ -1584,7 +1584,7 @@ const allGradeData = {
         },
         {
           "id": 6,
-          "correct": "A",
+          "correct": "C",
           "skill": [
             "地球氣候"
           ],
@@ -6017,6 +6017,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 讓 script.js 可以用全域變數拿到資料
 window.allGradeData = allGradeData;
+
 
 
 
